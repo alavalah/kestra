@@ -1,0 +1,146 @@
+id: border-crossing-etl
+namespace: etl.project
+
+tasks:
+  - id: extract_task
+    type: io.kestra.plugin.scripts.python.Script
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    beforeCommands:
+      - python3 -m venv .venv
+      - . .venv/bin/activate
+      - pip install pandas
+      - pip install requests
+    outputFiles:
+      - Border_Crossing_Entry_Data.csv
+    warningOnStdErr: false
+    script: |
+      import requests
+      url = "https://raw.githubusercontent.com/codewithharsha/ETL-Pipeline/main/Border_Crossing_Entry_Data.csv"
+      response = requests.get(url)
+      with open("Border_Crossing_Entry_Data.csv", "wb") as f:
+          f.write(response.content)
+      print("Download complete.")
+  - id: transform_data
+    type: io.kestra.plugin.scripts.python.Script
+    outputFiles:
+      - transformed_data.csv
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    beforeCommands:
+      - python3 -m venv .venv
+      - . .venv/bin/activate
+      - pip install pandas numpy scikit-learn geopandas shapely
+    warningOnStdErr: false
+    script: |
+      import pandas as pd
+      import numpy as np
+      from shapely.wkt import loads
+      import geopandas as gpd
+      from sklearn.preprocessing import MinMaxScaler
+
+      data = pd.read_csv("{{ outputs.extract_task.outputFiles['Border_Crossing_Entry_Data.csv'] }}")
+      print("Data Loaded!!")
+      print(data.shape)
+
+      for col in data.columns:
+          if data[col].dtype == 'object':
+              data[col] = data[col].fillna('Unknown')
+          else:
+              data[col] = data[col].fillna(0)
+      print("Successfully Handled Null Values")
+
+      data = data.drop_duplicates()
+      print("Successfully Dropped Duplicates!!")
+      print("Shape after deleting duplicates:",data.shape)
+
+      # Explicitly convert to string (if not already)
+      cols_to_convert = ['Port Name', 'State', 'Border', 'Measure']
+      for col in cols_to_convert:
+          data[col] = data[col].astype(str)
+      print("Successfully Handled Column types")
+
+      # Convert WKT Point string to shapely Point
+      data['geometry'] = data['Point'].apply(loads)
+      # Convert to GeoDataFrame
+      gdf = gpd.GeoDataFrame(data, geometry='geometry')
+      print("Successfully Handled point column!!")
+
+      data['New Date'] = pd.to_datetime(data['Date'],errors='coerce')
+      print("Successfully Handled date column!!")
+
+
+      scaler = MinMaxScaler()
+      data[['Value_norm']] = scaler.fit_transform(data[['Value']])
+      print("Successfully scaled value column!!")
+
+
+      # Extract year, month, and day of week
+      data['Year'] = data['New Date'].dt.year
+      data['Month'] = data['New Date'].dt.month
+      data['Month_Name'] = data['New Date'].dt.month_name()
+
+      def get_season(month):
+          if month in [12, 1, 2]:
+              return 'Winter'
+          elif month in [3, 4, 5]:
+              return 'Spring'
+          elif month in [6, 7, 8]:
+              return 'Summer'
+          else:
+              return 'Autumn'
+
+      data['Season'] = data['Month'].apply(get_season)
+
+      print("Successfully added season column!!")
+
+      data['Traffic_Level'] = pd.cut(
+          data['Value'],
+          bins=[-1, 1000, 10000, float('inf')],
+          labels=['Low', 'Medium', 'High']
+      )
+
+      print("Successfully added traffic level column!!")
+      print("No.f rows after processing the data:",len(data))
+      data.to_csv('transformed_data.csv', index=False)
+  - id: load_data
+    type: io.kestra.plugin.scripts.python.Script
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    beforeCommands:
+      - python3 -m venv .venv
+      - . .venv/bin/activate
+      - pip install pandas SQLAlchemy PyMySQL
+    warningOnStdErr: false
+    script: |
+      import pandas as pd
+      from sqlalchemy import create_engine
+
+      # Read the transformed data CSV
+      df = pd.read_csv("{{ outputs.transform_data.outputFiles['transformed_data.csv'] }}")
+      print("No.Of records in transformed data:",len(df))
+      # MySQL connection
+      engine = create_engine("mysql+pymysql://root:2002@host.docker.internal:3306/etl_pipeline")
+
+      # Push DataFrame to MySQL table (replaces if already exists)
+      df.to_sql("border_crossing_data", con=engine, index=False, if_exists='replace')
+
+      print("Data inserted successfully using to_sql()!")
+  - id: verify_with_python
+    type: io.kestra.plugin.scripts.python.Script
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    beforeCommands:
+      - python3 -m venv .venv
+      - . .venv/bin/activate
+      - pip install sqlalchemy pymysql
+    warningOnStdErr: false
+    script: |
+      from sqlalchemy import create_engine, text
+
+      engine = create_engine("mysql+pymysql://root:2002@host.docker.internal:3306/etl_pipeline")
+
+      with engine.connect() as conn:
+          result = conn.execute(text("SELECT COUNT(*) AS row_count FROM border_crossing_data"))
+          row = result.fetchone()
+          print(f"Inserted {row[0]} records into MySQL.")
