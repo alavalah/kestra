@@ -16,7 +16,7 @@ tasks:
     warningOnStdErr: false
     script: |
       import requests
-      url = "https://raw.githubusercontent.com/codewithharsha/ETL-Pipeline/main/Border_Crossing_Entry_Data.csv"
+      url = "https://raw.githubusercontent.com/alavalah/kestra/refs/heads/main/processed_border_crossing_data.csv"
       response = requests.get(url)
       with open("Border_Crossing_Entry_Data.csv", "wb") as f:
           f.write(response.content)
@@ -110,7 +110,7 @@ tasks:
     beforeCommands:
       - python3 -m venv .venv
       - . .venv/bin/activate
-      - pip install pandas SQLAlchemy PyMySQL
+      - pip install pandas SQLAlchemy PyMySQL cryptography
     warningOnStdErr: false
     script: |
       import pandas as pd
@@ -120,7 +120,7 @@ tasks:
       df = pd.read_csv("{{ outputs.transform_data.outputFiles['transformed_data.csv'] }}")
       print("No.Of records in transformed data:",len(df))
       # MySQL connection
-      engine = create_engine("mysql+pymysql://root:2002@host.docker.internal:3306/etl_pipeline")
+      engine = create_engine("mysql+pymysql://root:Alavala@host.docker.internal:3306/etl_pipeline")
 
       # Push DataFrame to MySQL table (replaces if already exists)
       df.to_sql("border_crossing_data", con=engine, index=False, if_exists='replace')
@@ -138,7 +138,7 @@ tasks:
     script: |
       from sqlalchemy import create_engine, text
 
-      engine = create_engine("mysql+pymysql://root:2002@host.docker.internal:3306/etl_pipeline")
+      engine = create_engine("mysql+pymysql://root:Alavala@host.docker.internal:3306/etl_pipeline")
 
       with engine.connect() as conn:
           result = conn.execute(text("SELECT COUNT(*) AS row_count FROM border_crossing_data"))
