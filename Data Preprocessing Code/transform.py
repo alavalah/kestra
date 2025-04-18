@@ -5,7 +5,7 @@ from shapely.wkt import loads
 import geopandas as gpd
 from sklearn.preprocessing import MinMaxScaler
 
-data = pd.read_csv("https://raw.githubusercontent.com/codewithharsha/ETL-Pipeline/main/Border_Crossing_Entry_Data.csv")
+data = pd.read_csv("https://raw.githubusercontent.com/alavalah/kestra/refs/heads/main/processed_border_crossing_data.csv")
 
 # data.head()
 
