@@ -11,7 +11,8 @@ An end-to-end **ETL data pipeline** that extracts U.S. Border Crossing Entry Dat
 | Language       | Python 3.10                                 |
 | Libraries      | pandas, numpy, geopandas, scikit-learn, shapely, sqlalchemy, pymysql |
 | Database       | MySQL 8.0                                   |
-| Visualization  | Power BI / Google Looker Studio             |
+| Visualization  | Power BI                                    |
+| orchestration  | Docker                                      |
 
 ---
 
