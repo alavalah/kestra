@@ -120,7 +120,7 @@ tasks:
       df = pd.read_csv("{{ outputs.transform_data.outputFiles['transformed_data.csv'] }}")
       print("No.Of records in transformed data:",len(df))
       # MySQL connection
-      engine = create_engine("mysql+pymysql://root:Alavala@host.docker.internal:3306/etl_pipeline")
+      engine = create_engine("mysql+pymysql://root:123456@host.docker.internal:3306/etl_pipeline")
 
       # Push DataFrame to MySQL table (replaces if already exists)
       df.to_sql("border_crossing_data", con=engine, index=False, if_exists='replace')
@@ -138,7 +138,7 @@ tasks:
     script: |
       from sqlalchemy import create_engine, text
 
-      engine = create_engine("mysql+pymysql://root:Alavala@host.docker.internal:3306/etl_pipeline")
+      engine = create_engine("mysql+pymysql://root:123456@host.docker.internal:3306/etl_pipeline")
 
       with engine.connect() as conn:
           result = conn.execute(text("SELECT COUNT(*) AS row_count FROM border_crossing_data"))
