@@ -1,4 +1,4 @@
-# 🇺🇸 Border Crossing Data ETL Pipeline with Kestra
+# US Border Crossing Data ETL Pipeline with Kestra
 
 An end-to-end **ETL data pipeline** that extracts U.S. Border Crossing Entry Data, performs advanced transformation and feature engineering, loads it into a **MySQL** database, and visualizes key insights using **Power BI / Looker Studio**. Orchestrated using **Kestra**.
 
