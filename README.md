@@ -65,9 +65,9 @@ docker run --name mysql-etl \
   -p 3306:3306 \
   -d mysql:8.0
 docker-compose up -d  # Inside the Kestra project folder
-<img src="https://github.com/yourusername/yourrepo/blob/main/screenshots/monthly_trend.png" width="500"/> <img src="https://github.com/yourusername/yourrepo/blob/main/screenshots/traffic_levels.png" width="500"/>
+'''
+<img srchttps://github.com/alavalah/kestra/blob/main/Broder%20crossing%20data%20visualization.png?raw=true" width="500"/>
 
----
 
 Let me know:
 - If you want this customized for **Looker Studio only**
