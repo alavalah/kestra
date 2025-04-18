@@ -3,10 +3,6 @@
 An end-to-end **ETL data pipeline** that extracts U.S. Border Crossing Entry Data, performs advanced transformation and feature engineering, loads it into a **MySQL** database, and visualizes key insights using **Power BI / Looker Studio**. Orchestrated using **Kestra**.
 
 ---
-
-## 🚀 Project Architecture
-
-
 ---
 
 ## 🧰 Tech Stack
@@ -66,6 +62,8 @@ docker run --name mysql-etl \
   -d mysql:8.0
 docker-compose up -d  # Inside the Kestra project folder
 ```
+## Output Images
+
 <img src="https://github.com/alavalah/kestra/blob/main/Kestra%20etl.png?raw=true" width="500"/>
 <img src="https://github.com/alavalah/kestra/blob/main/Kestra%20logs.png?raw=true" width="500"/>
 <img src="https://github.com/alavalah/kestra/blob/main/Kestra%20ouput%20logs.png?raw=true" width="500"/>
