@@ -65,7 +65,7 @@ docker run --name mysql-etl \
   -p 3306:3306 \
   -d mysql:8.0
 docker-compose up -d  # Inside the Kestra project folder
-'''
+```
 <img srchttps://github.com/alavalah/kestra/blob/main/Broder%20crossing%20data%20visualization.png?raw=true" width="500"/>
 
 
