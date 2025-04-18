@@ -66,12 +66,7 @@ docker run --name mysql-etl \
   -d mysql:8.0
 docker-compose up -d  # Inside the Kestra project folder
 ```
+<img src="https://github.com/alavalah/kestra/blob/main/Kestra%20etl.png?raw=true" width="500"/>
+<img src="https://github.com/alavalah/kestra/blob/main/Kestra%20logs.png?raw=true" width="500"/>
+<img src="https://github.com/alavalah/kestra/blob/main/Kestra%20ouput%20logs.png?raw=true" width="500"/>
 <img src="https://github.com/alavalah/kestra/blob/main/Broder%20crossing%20data%20visualization.png?raw=true" width="500"/>
-
-
-Let me know:
-- If you want this customized for **Looker Studio only**
-- Want me to generate badge icons (like GitHub stars, license, etc.)
-- Or want the actual `.md` file to download directly
-
-Would you like a sample diagram image for the architecture too?
